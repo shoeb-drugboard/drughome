@@ -34,12 +34,14 @@ export default function CardDetail() {
         setIsContentVisible(false);
         setTimeout(() => {
             setIsMinimizing(true);
-        }, 200);
+        }, 500);
     };
 
     const handleAnimationComplete = () => {
         if (isMinimizing) {
-            router.push('/');
+            setTimeout(() => {
+                router.push('/');
+            }, 1000);
         }
     };
 
