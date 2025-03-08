@@ -1,10 +1,7 @@
-"use client";
-
 import "./globals.css";
-// import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
-import { AnimatePresence } from 'framer-motion';
 import ClientProviders from "./providers";
+import NavigationBar from "@/components/Navbar";
 
 const poppins = Poppins({
   weight: ['400', '500', '600', '700'],
@@ -27,9 +24,10 @@ export default function RootLayout({
       </head>
       <body className={`${poppins.style} font-poppins antialiased scroll-smooth w-full h-full light bg-background text-foreground`}>
         <ClientProviders>
-          <AnimatePresence mode="wait" initial={false}>
+          <div className="w-screen h-screen flex items-center gap-3 bg-gradient-to-t from-pink-300 to-purple-300 px-4">
+            <NavigationBar />
             {children}
-          </AnimatePresence>
+          </div>
         </ClientProviders>
       </body>
     </html>

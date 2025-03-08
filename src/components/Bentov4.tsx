@@ -1,10 +1,10 @@
 import cn from '../utils/cn';
 import React, { useState } from 'react';
+import { Spinner } from '@heroui/spinner';
+import { useRouter } from 'next/navigation';
 import { Card, CardBody } from '@heroui/card';
 import { Maximize, Minimize } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
-import { Spinner } from '@heroui/spinner';
 
 type CardSizeConfig = {
     default: string;
@@ -50,7 +50,7 @@ const BentoCard: React.FC<BentoCardProps> = ({
         isAnotherCardMaximized ? "invisible" : "visible",
         "col-span-1",
         isMaximized
-            ? "col-span-full row-span-full h-screen md:col-span-full md:row-span-full xl:col-span-full xl:row-span-full z-50"
+            ? "col-span-full row-span-full h-screen z-50"
             : cn(
                 sizeConfig.md || "",
                 sizeConfig.xl || "",
@@ -67,9 +67,9 @@ const BentoCard: React.FC<BentoCardProps> = ({
             setIsLoading(true);
             toggleMaximize(id);
 
-            setTimeout(() => {
-                router.push(`/card/${id}`);
-            }, 400); // Longer delay to show the partial expansion
+            // setTimeout(() => {
+            router.push(`/card/${id}`);
+            // }, 200); // Longer delay to show the partial expansion
         }
     };
 
@@ -77,11 +77,11 @@ const BentoCard: React.FC<BentoCardProps> = ({
         normal: { scale: 1, opacity: 1, zIndex: 1 },
         expanding: {
             scale: 1,
+            scaleY: 0.95,
             opacity: 0.85,
             zIndex: 50,
             transition: {
-                duration: 1.2,
-                ease: "easeInOut"
+                ease: "linear"
             }
         },
         hidden: { opacity: 0, zIndex: 1 }
@@ -103,7 +103,7 @@ const BentoCard: React.FC<BentoCardProps> = ({
                 opacity: { duration: isAnotherCardMaximized ? 0.2 : 0.5 }
             }}
         >
-            <Card className="bg-transparent border-none shadow-sm h-full relative">
+            <Card className="bg-transparent border-none shadow-sm relative h-full">
                 <div className="flex justify-end p-2 ">
                     <motion.div
                         whileHover={{ scale: 1.2 }}
@@ -139,8 +139,8 @@ const cards: CardData[] = [
         description: "This is the first card with detailed content.",
         sizeConfig: {
             default: "",
-            md: "md:col-span-3 md:row-span-2",
-            xl: "xl:col-span-2 xl:row-span-3"
+            md: "md:col-span-3 md:row-span-6",
+            xl: "xl:col-span-2 xl:row-span-6"
         }
     },
     {
@@ -150,8 +150,8 @@ const cards: CardData[] = [
         description: "This is the second card with more information.",
         sizeConfig: {
             default: "",
-            md: "md:col-span-3 md:row-span-2",
-            xl: "xl:col-span-5 xl:row-span-3"
+            md: "md:col-span-3 md:row-span-6",
+            xl: "xl:col-span-5 xl:row-span-6"
         }
     },
     {
@@ -161,8 +161,8 @@ const cards: CardData[] = [
         description: "A third card with additional details.",
         sizeConfig: {
             default: "",
-            md: "md:col-span-3 md:row-span-3",
-            xl: "xl:col-span-3 xl:row-span-3"
+            md: "md:col-span-3 md:row-span-6",
+            xl: "xl:col-span-3 xl:row-span-6"
         }
     },
     {
@@ -172,8 +172,8 @@ const cards: CardData[] = [
         description: "The fourth card with extra information.",
         sizeConfig: {
             default: "",
-            md: "md:col-span-3 md:row-span-2",
-            xl: "xl:col-span-3 xl:row-span-3"
+            md: "md:col-span-3 md:row-span-6",
+            xl: "xl:col-span-3 xl:row-span-6"
         }
     },
     {
@@ -183,8 +183,8 @@ const cards: CardData[] = [
         description: "The fifth card with more content.",
         sizeConfig: {
             default: "",
-            md: "md:col-span-6 md:row-span-1",
-            xl: "xl:col-span-5 xl:row-span-3"
+            md: "md:col-span-6 md:row-span-6",
+            xl: "xl:col-span-5 xl:row-span-6"
         }
     },
     {
@@ -194,8 +194,8 @@ const cards: CardData[] = [
         description: "The sixth and final card with details.",
         sizeConfig: {
             default: "",
-            md: "md:col-span-6 md:row-span-1",
-            xl: "xl:col-span-2 xl:row-span-3"
+            md: "md:col-span-6 md:row-span-6",
+            xl: "xl:col-span-2 xl:row-span-6"
         }
     }
 ];
@@ -211,26 +211,26 @@ const BentoGridV4: React.FC = () => {
     };
 
     return (
-        <div className="w-full h-screen mx-auto relative mt-24">
-            <div className="h-full p-[1vw] rounded-sm bg-gradient-to-t from-pink-300 to-purple-300 grid grid-flow-dense col-start-auto gap-[1.5vw] md:grid-cols-6 xl:grid-cols-10 relative overflow-hidden">
-                <AnimatePresence>
-                    {cards.map((card, index) => (
-                        <BentoCard
-                            key={card.id}
-                            id={card.id}
-                            index={index}
-                            maximizedCard={maximizedCard}
-                            toggleMaximize={toggleMaximize}
-                            sizeConfig={card.sizeConfig}
-                            title={card.title}
-                            description={card.description}
-                        >
-                            {card.content}
-                        </BentoCard>
-                    ))}
-                </AnimatePresence>
-            </div>
+        // <div className="w-full h-full mx-auto relative ">
+        <div className="h-full p-4 rounded-sm grid grid-flow-dense grid-rows-12 gap-[1.5vw] md:grid-cols-6 xl:grid-cols-10 relative overflow-hidden">
+            <AnimatePresence>
+                {cards.map((card, index) => (
+                    <BentoCard
+                        key={card.id}
+                        id={card.id}
+                        index={index}
+                        maximizedCard={maximizedCard}
+                        toggleMaximize={toggleMaximize}
+                        sizeConfig={card.sizeConfig}
+                        title={card.title}
+                        description={card.description}
+                    >
+                        {card.content}
+                    </BentoCard>
+                ))}
+            </AnimatePresence>
         </div>
+        // </div>
     );
 };
 

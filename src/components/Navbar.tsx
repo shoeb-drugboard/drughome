@@ -1,71 +1,67 @@
-import React from 'react'
-import Image from 'next/image';
-// import { Link } from "@heroui/link";
-import { Input } from "@heroui/input";
-import { Avatar } from "@heroui/avatar";
-import { SearchIcon } from "@/components/icons/SearchIcon";
-import { Navbar, NavbarContent, NavbarBrand } from "@heroui/navbar";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+"use client";
+import React, { useState, useEffect, useMemo } from 'react'
+import { useRouter, usePathname } from 'next/navigation';
+import { motion } from 'framer-motion'
+import { Tooltip } from '@heroui/react'
+import { DoorClosed, DoorOpen, HomeIcon, LayoutDashboardIcon, MapPin, MessagesSquareIcon } from 'lucide-react';
 
 const NavigationBar = () => {
-    return (
-        <Navbar isBlurred={false} className='bg-white/5 backdrop-blur-xl fixed top-0 left-0 flex justify-between h-24 px-4 w-full'>
-            <NavbarContent as="div" className="items-center" justify="start">
-                <NavbarBrand className="mr-4">
-                    <Image src={'./logo.svg'} alt="ACME Logo" height={360} width={360} className='' />
-                    {/* <p className="hidden sm:block font-bold text-inherit">ACME</p> */}
-                </NavbarBrand>
-                <NavbarContent as="div" className="hidden sm:flex items-center gap-4">
-                    {/* <Link href="/home">Home</Link>
-                    <Link href="/about">About</Link>
-                    <Link href="/contact">Contact</Link> */}
-                </NavbarContent>
-            </NavbarContent>
+    const router = useRouter();
+    const pathname = usePathname();
+    const [activeLink, setActiveLink] = useState('/dashboard'); // Set dashboard as default
 
-            <NavbarContent as="div" className="items-center mx-auto" justify="end">
-                <Input
-                    classNames={{
-                        base: "max-w-full sm:max-w-full h-16",
-                        mainWrapper: "h-full",
-                        input: "text-small",
-                        inputWrapper:
-                            "h-full font-normal text-default-500 bg-white/80 dark:bg-default-500/20",
-                    }}
-                    placeholder="Type to search..."
-                    size="sm"
-                    startContent={<SearchIcon size={18} />}
-                    type="search"
-                />
-                <Dropdown placement="bottom-end">
-                    <DropdownTrigger>
-                        <Avatar
-                            isBordered
-                            as="button"
-                            className="transition-transform"
-                            color="secondary"
-                            name="Jason Hughes"
-                            size="sm"
-                            src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-                        />
-                    </DropdownTrigger>
-                    <DropdownMenu aria-label="Profile Actions" variant="flat">
-                        <DropdownItem key="profile" className="h-14 gap-2">
-                            <p className="font-semibold">Signed in as</p>
-                            <p className="font-semibold">zoey@example.com</p>
-                        </DropdownItem>
-                        <DropdownItem key="settings">My Settings</DropdownItem>
-                        <DropdownItem key="team_settings">Team Settings</DropdownItem>
-                        <DropdownItem key="analytics">Analytics</DropdownItem>
-                        <DropdownItem key="system">System</DropdownItem>
-                        <DropdownItem key="configurations">Configurations</DropdownItem>
-                        <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
-                        <DropdownItem key="logout" color="danger">
-                            Log Out
-                        </DropdownItem>
-                    </DropdownMenu>
-                </Dropdown>
-            </NavbarContent>
-        </Navbar>
+    const navItems = useMemo(() => [
+        { icon: HomeIcon, path: '/home', title: 'Home' },
+        { icon: MessagesSquareIcon, path: '/messages', title: 'Messages' },
+        { icon: LayoutDashboardIcon, path: '/', title: 'Dashboard' },
+        { icon: DoorOpen, path: '/room', title: 'Room' },
+        { icon: MapPin, path: '/location', title: 'Location' },
+        { icon: DoorClosed, path: '/exit', title: 'Exit' },
+    ], []);
+
+    useEffect(() => {
+        // Check if current path is in navItems, otherwise keep dashboard as active
+        const isValidPath = navItems.some(item => item.path === pathname);
+        if (isValidPath) {
+            setActiveLink(pathname);
+        }
+    }, [pathname, navItems]);
+
+    const handleNavigation = (path: string) => {
+        setActiveLink(path);
+        router.push(path);
+    };
+
+    return (
+        <motion.div
+            className='bg-white/80 backdrop-blur-xl flex justify-center items-center p-3 rounded-full w-[4vw] h-max border border-black/20 shadow-md'
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+        >
+            <div className="h-full py-4 flex flex-col items-center justify-evenly text-black gap-4">
+                {navItems.map((item) => (
+                    <Tooltip key={item.path} content={item.title} placement="right">
+                        <motion.div
+                            onClick={() => handleNavigation(item.path)}
+                            className={`cursor-pointer p-2 rounded-full ${activeLink === item.path ? 'bg-gradient-to-r from-pink-200 to-purple-200' : ''}`}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            <motion.div
+                                animate={{
+                                    scale: activeLink === item.path ? 1.1 : 1
+                                }}
+                                transition={{ duration: 0.2 }}
+                                className={activeLink === item.path ? 'bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600 p-1' : 'text-black'}
+                            >
+                                <item.icon size={24} />
+                            </motion.div>
+                        </motion.div>
+                    </Tooltip>
+                ))}
+            </div>
+        </motion.div>
     );
 }
 
