@@ -11,34 +11,63 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 export type CardType = 'UserProfile' | 'Posts' | 'Leaderboard' | 'SynergyMatch' | 'Messages' | 'EmptyCard';
 
+const animationVariants = {
+    container: {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.2,
+                when: "beforeChildren"
+            }
+        },
+        exit: {
+            opacity: 0,
+            transition: {
+                staggerChildren: 0.05,
+                staggerDirection: -1,
+                when: "afterChildren"
+            }
+        }
+    },
+    card: {
+        hidden: { y: -60, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            transition: {
+                type: "spring",
+                damping: 15,
+                stiffness: 200
+            }
+        },
+        exit: {
+            y: -40,
+            opacity: 0,
+            transition: {
+                duration: 0.2,
+                ease: "easeInOut"
+            }
+        }
+    }
+};
+
 const BentoGridV6 = () => {
     const [maximizedCard, setMaximizedCard] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
     const [transitioningCards, setTransitioningCards] = useState<Record<string, boolean>>({});
 
     const toggleMaximize = (cardId: string) => {
-        // Mark the card as transitioning
         setTransitioningCards(prev => ({ ...prev, [cardId]: true }));
-
-        // Update the maximized state
         setMaximizedCard(prev => prev === cardId ? null : cardId);
-
-        // After transition completes, remove the transitioning state
         setTimeout(() => {
             setTransitioningCards(prev => ({ ...prev, [cardId]: false }));
-        }, 400); // Slightly longer than animation duration
+        }, 400);
     };
-
-    React.useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 1500);
-        return () => clearTimeout(timer);
-    }, []);
 
     const getMaximizedClassName = (cardId: string) => {
         if (maximizedCard === cardId) {
-            return 'col-span-full row-span-full z-10';
+            return 'col-span-full row-span-full z-10 max-h-none md:col-span-6 xl:col-span-12 xl:row-span-12';
         }
         return '';
     };
@@ -53,146 +82,142 @@ const BentoGridV6 = () => {
     };
 
     return (
-        <div className="h-full p-4 rounded-sm grid grid-flow-dense grid-rows-12 gap-[1.5vw] md:grid-cols-6 xl:grid-cols-10 relative overflow-hidden">
-            <AnimatePresence>
-                {isLoading ? (
-                    <>
-                        <Card className="col-span-2 row-span-6"><SkeletonLoader type="detailed" /></Card>
-                        <Card className="col-span-5 row-span-6"><SkeletonLoader /></Card>
-                        <Card className="col-span-3 row-span-5"><SkeletonLoader type="content" /></Card>
-                        <Card className="col-span-3 row-span-7"><SkeletonLoader /></Card>
-                        <Card className="col-span-3 row-span-6"><SkeletonLoader /></Card>
-                        <Card className="col-span-4 row-span-6"><SkeletonLoader type="content" /></Card>
-                    </>
-                ) : (
-                    <>
-                        {showCard('UserProfile') && (
-                            <motion.div
-                                className={cn(`col-span-2 row-span-6 h-full`, getMaximizedClassName('UserProfile'))}
-                                layout
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                {isTransitioning('UserProfile') ? (
-                                    <Card className="h-full bg-white/60 backdrop-blur-xl">
-                                        <SkeletonLoader type="content" />
-                                    </Card>
-                                ) : (
-                                    <UserProfile
-                                        cardId="UserProfile"
-                                        maximizedCard={maximizedCard}
-                                        toggleMaximize={toggleMaximize}
-                                        className='h-full bg-white/60 backdrop-blur-xl'
-                                    />
-                                )}
-                            </motion.div>
-                        )}
+        <motion.div
+            className="h-full w-full p-4 rounded-sm grid grid-flow-dense grid-rows-12 gap-[1.5vw] xl:h-screen md:grid-cols-6 xl:grid-cols-10 relative overflow-hidden"
+            variants={animationVariants.container}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+        >
+            <AnimatePresence mode="wait">
+                <motion.div
+                    className="h-full w-full col-span-full row-span-full grid grid-flow-dense grid-rows-12 gap-[1.5vw] md:grid-cols-6 xl:grid-cols-12"
+                    variants={animationVariants.container}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                >
+                    {showCard('UserProfile') && (
+                        <motion.div
+                            className={cn(`col-span-full md:col-span-3 lg:col-span-2 xl:col-span-3 row-span-6 h-full max-h-[450px]`, getMaximizedClassName('UserProfile'))}
+                            layout
+                            variants={animationVariants.card}
+                            transition={{ duration: 0.3 }}
+                        >
+                            {isTransitioning('UserProfile') ? (
+                                <Card className="h-full bg-white/60 backdrop-blur-xl">
+                                    <SkeletonLoader type="content" />
+                                </Card>
+                            ) : (
+                                <UserProfile
+                                    cardId="UserProfile"
+                                    maximizedCard={maximizedCard}
+                                    toggleMaximize={toggleMaximize}
+                                    className='h-full bg-white/60 backdrop-blur-xl'
+                                />
+                            )}
+                        </motion.div>
+                    )}
 
-                        {showCard('Posts') && (
-                            <motion.div
-                                className={cn(`col-span-5 row-span-6`, getMaximizedClassName('Posts'))}
-                                layout
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                {isTransitioning('Posts') ? (
-                                    <Card className="h-full py-8">
-                                        <SkeletonLoader />
-                                    </Card>
-                                ) : (
-                                    <Posts
-                                        cardId="Posts"
-                                        maximizedCard={maximizedCard}
-                                        toggleMaximize={toggleMaximize}
-                                        className='h-full py-8 grid place-content-center'
-                                    />
-                                )}
-                            </motion.div>
-                        )}
+                    {showCard('Posts') && (
+                        <motion.div
+                            className={cn(`col-span-full md:col-span-3 lg:col-span-4 xl:col-span-6 row-span-6 max-h-[450px]`, getMaximizedClassName('Posts'))}
+                            layout
+                            variants={animationVariants.card}
+                            transition={{ duration: 0.3 }}
+                        >
+                            {isTransitioning('Posts') ? (
+                                <Card className="h-full">
+                                    <SkeletonLoader />
+                                </Card>
+                            ) : (
+                                <Posts
+                                    cardId="Posts"
+                                    maximizedCard={maximizedCard}
+                                    toggleMaximize={toggleMaximize}
+                                    className='h-full py-8 grid place-content-center'
+                                />
+                            )}
+                        </motion.div>
+                    )}
 
-                        {showCard('EmptyCard') && !maximizedCard && (
-                            <Card className='col-span-3 row-span-5 bg-white/60 backdrop-blur-xl'></Card>
-                        )}
+                    {showCard('EmptyCard') && !maximizedCard && (
+                        <motion.div
+                            className='col-span-full md:col-span-3 md:row-span-6 lg:col-span-2 xl:col-span-3 row-span-5 lg:row-span-6 xl:row-span-5 max-h-[450px]'
+                            variants={animationVariants.card}
+                        >
+                            <Card className='h-full bg-white/60 backdrop-blur-xl'></Card>
+                        </motion.div>
+                    )}
 
-                        {showCard('Leaderboard') && (
-                            <motion.div
-                                className={cn(`col-span-3 row-span-7`, getMaximizedClassName('Leaderboard'))}
-                                layout
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                {isTransitioning('Leaderboard') ? (
-                                    <Card className="h-full">
-                                        <SkeletonLoader type="content" />
-                                    </Card>
-                                ) : (
-                                    <Leaderboard
-                                        cardId="Leaderboard"
-                                        maximizedCard={maximizedCard}
-                                        toggleMaximize={toggleMaximize}
-                                        className='h-full'
-                                    />
-                                )}
-                            </motion.div>
-                        )}
+                    {showCard('Leaderboard') && (
+                        <motion.div
+                            className={cn(`col-span-full md:col-span-3 lg:col-span-2 xl:col-span-3 row-span-6 xl:row-span-8 max-h-[450px]`, getMaximizedClassName('Leaderboard'))}
+                            layout
+                            variants={animationVariants.card}
+                            transition={{ duration: 0.3 }}
+                        >
+                            {isTransitioning('Leaderboard') ? (
+                                <Card className="h-full">
+                                    <SkeletonLoader type="content" />
+                                </Card>
+                            ) : (
+                                <Leaderboard
+                                    cardId="Leaderboard"
+                                    maximizedCard={maximizedCard}
+                                    toggleMaximize={toggleMaximize}
+                                    className='h-full'
+                                />
+                            )}
+                        </motion.div>
+                    )}
 
-                        {showCard('SynergyMatch') && (
-                            <motion.div
-                                className={cn(`col-span-3 row-span-6 `, getMaximizedClassName('SynergyMatch'))}
-                                layout
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                {isTransitioning('SynergyMatch') ? (
-                                    <Card className="h-full">
-                                        <SkeletonLoader type="content" />
-                                    </Card>
-                                ) : (
-                                    <SynergyMatch
-                                        cardId="SynergyMatch"
-                                        maximizedCard={maximizedCard}
-                                        toggleMaximize={toggleMaximize}
-                                        className='h-full'
-                                    />
-                                )}
-                            </motion.div>
-                        )}
+                    {showCard('SynergyMatch') && (
+                        <motion.div
+                            className={cn(`col-span-full md:col-span-6 lg:col-span-2 xl:col-span-3 row-span-7 max-h-[450px]`, getMaximizedClassName('SynergyMatch'))}
+                            layout
+                            variants={animationVariants.card}
+                            transition={{ duration: 0.3 }}
+                        >
+                            {isTransitioning('SynergyMatch') ? (
+                                <Card className="h-full">
+                                    <SkeletonLoader type="content" />
+                                </Card>
+                            ) : (
+                                <SynergyMatch
+                                    cardId="SynergyMatch"
+                                    maximizedCard={maximizedCard}
+                                    toggleMaximize={toggleMaximize}
+                                    className='h-full'
+                                />
+                            )}
+                        </motion.div>
+                    )}
 
-                        {showCard('Messages') && (
-                            <motion.div
-                                className={cn(`col-span-4 row-span-6`, getMaximizedClassName('Messages'))}
-                                layout
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                {isTransitioning('Messages') ? (
-                                    <Card className="h-full">
-                                        <SkeletonLoader type="content" />
-                                    </Card>
-                                ) : (
-                                    <Messages
-                                        cardId="Messages"
-                                        maximizedCard={maximizedCard}
-                                        toggleMaximize={toggleMaximize}
-                                        className='h-full'
-                                    />
-                                )}
-                            </motion.div>
-                        )}
-                    </>
-                )}
+                    {showCard('Messages') && (
+                        <motion.div
+                            className={cn(`col-span-full md:col-span-6 xl:col-span-6 row-span-7 max-h-[450px]`, getMaximizedClassName('Messages'))}
+                            layout
+                            variants={animationVariants.card}
+                            transition={{ duration: 0.3 }}
+                        >
+                            {isTransitioning('Messages') ? (
+                                <Card className="h-full">
+                                    <SkeletonLoader type="content" />
+                                </Card>
+                            ) : (
+                                <Messages
+                                    cardId="Messages"
+                                    maximizedCard={maximizedCard}
+                                    toggleMaximize={toggleMaximize}
+                                    className='h-full'
+                                />
+                            )}
+                        </motion.div>
+                    )}
+                </motion.div>
             </AnimatePresence>
-        </div>
+        </motion.div>
     )
 };
 
