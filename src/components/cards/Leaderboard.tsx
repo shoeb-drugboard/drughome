@@ -1,6 +1,6 @@
-import React, { JSX } from 'react';
+import React from 'react';
 import { Card, CardBody, CardHeader, Avatar, Chip, Divider, Button } from "@heroui/react";
-import { Flame, Trophy, Medal, Crown, Star, Maximize, Minimize } from "lucide-react";
+import { Flame, Trophy, Maximize, Minimize } from "lucide-react";
 import { motion } from "framer-motion";
 import cn from '@/utils/cn';
 
@@ -54,19 +54,6 @@ const Leaderboard = ({ className, cardId, maximizedCard, toggleMaximize }: Leade
         show: { x: 0, opacity: 1 }
     };
 
-    // Function to get medal icon based on rank
-    const getMedalIcon = (rank: number): JSX.Element => {
-        switch (rank) {
-            case 1:
-                return <Crown className="text-yellow-500" />;
-            case 2:
-                return <Medal className="text-gray-400" />;
-            case 3:
-                return <Medal className="text-amber-700" />;
-            default:
-                return <Star className="text-purple-400" />;
-        }
-    };
 
     const getRankStyle = (rank: number) => {
         switch (rank) {
@@ -94,7 +81,6 @@ const Leaderboard = ({ className, cardId, maximizedCard, toggleMaximize }: Leade
             </CardHeader>
 
             <CardBody>
-                {/* Scrollable leaderboard */}
                 <div
                     className="h-auto overflow-y-auto pr-2 -mr-2 scroll-smooth 
                     [&::-webkit-scrollbar]:w-1 
@@ -113,7 +99,7 @@ const Leaderboard = ({ className, cardId, maximizedCard, toggleMaximize }: Leade
                                 key={user.id}
                                 variants={itemVariants}
                                 className={cn(
-                                    "flex items-center p-3 rounded-lg",
+                                    "flex items-center px-2 rounded-lg",
                                     user.rank <= 3 ? "bg-gradient-to-br from-gray-50 to-black/20 dark:from-gray-800 dark:to-gray-900" : " bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900"
                                 )}
                             >
@@ -123,7 +109,7 @@ const Leaderboard = ({ className, cardId, maximizedCard, toggleMaximize }: Leade
                                 )}>
                                     {user.rank}
                                 </div>
-                                <div className="relative">
+                                <div className="relative py-1">
                                     <Avatar
                                         src={user.avatar}
                                         className={cn(
@@ -133,13 +119,6 @@ const Leaderboard = ({ className, cardId, maximizedCard, toggleMaximize }: Leade
                                                     user.rank === 3 ? "border-2 border-amber-700" : ""
                                         )}
                                     />
-                                    {user.rank <= 3 && (
-                                        <Chip
-                                            color={user.rank === 1 ? "warning" : user.rank === 2 ? "secondary" : "primary"}
-                                            variant="bordered">
-                                            {getMedalIcon(user.rank)}
-                                        </Chip>
-                                    )}
                                 </div>
                                 <div className="ml-3 flex-grow">
                                     <p className="font-semibold">{user.name}</p>
@@ -165,7 +144,6 @@ const Leaderboard = ({ className, cardId, maximizedCard, toggleMaximize }: Leade
 
                 <Divider className="my-1" />
 
-                {/* Current User */}
                 {currentUser && (
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
@@ -200,12 +178,11 @@ const Leaderboard = ({ className, cardId, maximizedCard, toggleMaximize }: Leade
                 )}
             </CardBody>
 
-            {/* Maximize/Minimize Button */}
             <motion.div
                 whileHover={{ scale: 1.1 }}
-                className='absolute top-2 right-2 flex bg-transparent gap-0 translate-x-0 -translate-y-0 z-10'
+                className='absolute top-2 -right-2 flex bg-transparent gap-0 translate-x-0 -translate-y-0 z-10'
             >
-                <Button className='bg-transparent p-0' onClick={() => toggleMaximize(cardId)}>
+                <Button className='bg-transparent p-0' onPress={() => toggleMaximize(cardId)}>
                     {isMaximized ?
                         <Minimize size={16} className="text-gray-500 hover:text-gray-700" /> :
                         <Maximize size={16} className="text-gray-500 hover:text-gray-700" />

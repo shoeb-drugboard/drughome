@@ -1,7 +1,7 @@
 import React from 'react'
 // import Image from 'next/image'
 import cn from '@/utils/cn';
-import { Maximize, Minimize, Settings, Twitter, Linkedin, Github, Mail, CalendarDays, MapPin } from 'lucide-react';
+import { Maximize, Minimize, Twitter, Linkedin, Github, Mail, CalendarDays, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@heroui/button';
 import { Card, CardFooter } from '@heroui/card';
@@ -67,12 +67,11 @@ const UserProfile: React.FC<ProfileCardProps> = ({
             <Card className={cn(`w-full pb-4 overflow-hidden`, className)}>
                 {/* Header background */}
                 <div className="relative w-full bg-gradient-to-r from-blue-500 to-purple-600 h-20">
-                    {/* Toggle maximize button */}
                     <motion.div
                         whileHover={{ scale: 1.1 }}
-                        className='absolute top-2 right-2'
+                        className='absolute top-1 right-0'
                     >
-                        <Button className='bg-white/30 hover:bg-white/50 p-1 rounded-full' onPress={() => toggleMaximize(cardId)}>
+                        <Button className='bg-white/0 p-1 rounded-full' onPress={() => toggleMaximize(cardId)}>
                             {isMaximized ?
                                 <Minimize size={16} className="text-white" /> :
                                 <Maximize size={16} className="text-white" />
@@ -81,7 +80,6 @@ const UserProfile: React.FC<ProfileCardProps> = ({
                     </motion.div>
                 </div>
 
-                {/* Avatar - positioned to overlap the header */}
                 <div className="flex justify-center -mt-10 mb-2">
                     <motion.div
                         initial={{ scale: 0 }}
@@ -111,14 +109,12 @@ const UserProfile: React.FC<ProfileCardProps> = ({
                     </div>
                 </div>
 
-                {/* Bio section - only show when maximized */}
                 {isMaximized && (
-                    <div className="px-6 mt-3">
+                    <div className="px-6 mt-3 max-w-5xl mx-auto">
                         <p className="text-sm text-slate-600 text-center">{bio}</p>
                     </div>
                 )}
 
-                {/* Stats section */}
                 <div className="flex justify-center gap-6 mt-3 px-4">
                     <div className="text-center">
                         <p className="font-semibold">{(stats.followers ?? 0).toLocaleString()}</p>
@@ -137,7 +133,7 @@ const UserProfile: React.FC<ProfileCardProps> = ({
                 {/* Skills section - only show when maximized */}
                 {isMaximized && (
                     <div className="px-4 mt-8">
-                        <div className="flex flex-wrap justify-start gap-2 items-center">
+                        <div className="flex flex-wrap justify-center gap-2 items-center">
                             {skills.map((skill, index) => (
                                 <Chip key={index} className="text-sm border-yellow-500 text-slate-50 bg-gradient-to-br from-red-400 to-purple-500" color='warning' variant='dot' >
                                     {skill}
@@ -172,14 +168,14 @@ const UserProfile: React.FC<ProfileCardProps> = ({
                 </CardFooter>
 
                 {/* Settings button */}
-                <motion.div
+                {/* <motion.div
                     whileHover={{ scale: 1.1 }}
                     className='absolute bottom-2 right-2'
                 >
                     <Button className='bg-transparent p-0 hover:bg-slate-100 rounded-full w-7 h-7 flex items-center justify-center'>
                         <Settings size={14} className="text-slate-400 hover:text-slate-600" />
                     </Button>
-                </motion.div>
+                </motion.div> */}
             </Card>
         </motion.div>
     )
