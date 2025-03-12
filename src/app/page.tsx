@@ -11,8 +11,8 @@ import BentoGridV6 from "@/components/Bentov6";
 
 export default function Home() {
   return (
-    <div className="relative w-[95vw] h-full flex-1">
-      <BentoGridV6 />
-    </div>
+    // <div className="relative w-[95vw] h-full flex-1">
+    <BentoGridV6 />
+    // </div>
   );
 }
