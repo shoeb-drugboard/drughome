@@ -1,7 +1,7 @@
 "use client";
 import React from 'react'
 import { Input, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@heroui/react'
-import { Search } from 'lucide-react'
+import { Search, Bell } from 'lucide-react'
 import Image from 'next/image'
 import { Modal, Button, Card, CardBody } from "@heroui/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,7 +11,6 @@ const Navbar = ({ className }: { className?: string }) => {
     const [searchTerm, setSearchTerm] = React.useState('')
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-    // Example notifications data
     const notifications = [
         { id: 1, message: "New medication added to database", time: "5 min ago", read: false },
         { id: 2, message: "Dosage update for Aspirin", time: "1 hour ago", read: false },
@@ -25,7 +24,7 @@ const Navbar = ({ className }: { className?: string }) => {
     return (
         <div className={cn("bg-transparent p-4 flex items-center justify-between w-full", className)}>
             <div className="logo flex ">
-                <Image src="/logo.svg" alt="logo" width={280} height={280} className=" w-auto cursor-pointer" />
+                <Image src="/logo.svg" alt="logo" width={280} height={280} className="w-full cursor-pointer min-w-[155px] md:min-w-[180px]" />
             </div>
 
             <div className="searchbar flex-grow max-w-3xl mx-4">
@@ -46,7 +45,24 @@ const Navbar = ({ className }: { className?: string }) => {
 
             <div className="notification-panel flex-shrink-0 ml-4 relative flex items-center">
                 <motion.div
-                    className="relative cursor-pointer h-20 w-64"
+                    className="md:hidden relative cursor-pointer"
+                    onClick={onOpen}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                >
+                    <Bell size={24} />
+                    {unreadCount > 0 && (
+                        <motion.div
+                            className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{ repeat: Infinity, duration: 2 }}
+                        >
+                            {unreadCount}
+                        </motion.div>
+                    )}
+                </motion.div>
+                <motion.div
+                    className="relative cursor-pointer h-20 w-64 hidden md:block"
                     onClick={onOpen}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -83,7 +99,6 @@ const Navbar = ({ className }: { className?: string }) => {
                         </motion.div>
                     )}
                 </motion.div>
-                {/* Modal for displaying all notifications */}
                 <Modal
                     isOpen={isOpen}
                     onOpenChange={onOpenChange}
